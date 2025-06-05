@@ -37,8 +37,7 @@ module "postgres_service" {
 
 
 module "backend_service" {
-  source = "./modules/docker-service"
-
+  source         = "./modules/docker-service"
   container_name = local.backend_container_name
   image          = var.backend_image
   network_name   = docker_network.app_network.name
@@ -50,23 +49,34 @@ module "backend_service" {
     "DB_PASSWORD" = var.postgres_password
     "DB_NAME"     = var.postgres_db
     "APP_PORT"    = tostring(var.backend_container_port)
+    "NODE_ENV"    = "production"
   }
-
   ports = [{
     internal = var.backend_container_port
+    external = var.backend_container_port
   }]
+
+  # Warte auf Postgres
+  command = [
+    "sh",
+    "-c",
+    "while ! nc -z ${local.postgres_container_name} 5432; do sleep 1; done; node src/server.js"
+  ]
 }
 
 
 module "frontend_service" {
-  source = "./modules/docker-service"
+  source        = "./modules/docker-service"
 
   container_name = local.frontend_container_name
-  image          = var.frontend_image
+  image          = var.frontend_image # stephipie/frontend-app:latest
   network_name   = docker_network.app_network.name
+  environment = {
+    "BACKEND_URL" = "${local.backend_container_name}:${var.backend_container_port}"
+  }
 
   ports = [{
-    internal = 80 # Annahme: Frontend-App lauscht auf Port 80 im Container
+    internal = 80
     external = var.frontend_host_port
   }]
 }
