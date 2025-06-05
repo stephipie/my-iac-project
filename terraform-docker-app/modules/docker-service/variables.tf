@@ -8,8 +8,8 @@ variable "image" {
   type        = string
 }
 
-variable "network_id" {
-  description = "Die ID des Docker-Netzwerks, mit dem der Container verbunden werden soll."
+variable "network_name" {
+  description = "Name des Docker-Netzwerks, mit dem der Container verbunden werden soll."
   type        = string
 }
 

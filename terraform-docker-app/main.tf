@@ -12,7 +12,7 @@ module "nginx_service" {
 
   container_name = local.nginx_container_name
   image          = var.nginx_image
-  network_id     = docker_network.app_network.id
+  network_name   = docker_network.app_network.name
 
   ports = [{
     internal = 80 # Nginx lauscht standardmäßig auf Port 80 im Container
@@ -25,7 +25,7 @@ module "node_app_service" {
 
   container_name = local.node_app_container_name
   image          = var.node_app_image
-  network_id     = docker_network.app_network.id
+  network_name   = docker_network.app_network.name
   command        = var.node_app_command
 
   ports = [{

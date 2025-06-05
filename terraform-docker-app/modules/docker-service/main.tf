@@ -14,9 +14,8 @@ resource "docker_container" "service" {
   }
 
   command = var.command
-}
 
-resource "docker_network_attachment" "service_network_attachment" {
-  container_id = docker_container.service.id
-  network_id   = var.network_id
+  networks_advanced {
+    name = var.network_name
+  }
 }
