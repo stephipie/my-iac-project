@@ -19,7 +19,7 @@ variable "nginx_image" {
 variable "nginx_host_port" {
   description = "Der Host-Port, auf den Nginx gemappt wird."
   type        = number
-  default     = 8080
+  default     = 8081 # geändert von 8080
 }
 
 variable "node_app_image" {
