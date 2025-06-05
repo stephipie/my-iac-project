@@ -33,7 +33,8 @@ variable "command" {
 variable "volumes" {
   description = "Eine Liste von Volume-Mount-Definitionen für den Container."
   type = list(object({
-    host_path      = string
+    host_path      = optional(string)
+    volume_name    = optional(string)
     container_path = string
     read_only      = optional(bool, false)
   }))

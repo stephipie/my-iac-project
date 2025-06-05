@@ -30,7 +30,7 @@ module "postgres_service" {
 
   # Volume Mount für persistente Daten
   volumes = [{
-    host_path      = docker_volume.postgres_data.name
+    volume_name    = docker_volume.postgres_data.name
     container_path = "/var/lib/postgresql/data"
   }]
 }

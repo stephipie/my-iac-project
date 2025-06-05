@@ -21,9 +21,10 @@ resource "docker_container" "service" {
   dynamic "volumes" {
     for_each = var.volumes
     content {
-      host_path      = volumes.value.host_path
+      host_path      = try(volumes.value.host_path, null)
       container_path = volumes.value.container_path
       read_only      = try(volumes.value.read_only, false)
+      volume_name    = try(volumes.value.volume_name, null)
     }
   }
 
