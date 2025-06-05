@@ -1,0 +1,31 @@
+variable "container_name" {
+  description = "Name des Docker-Containers."
+  type        = string
+}
+
+variable "image" {
+  description = "Docker Image für den Container."
+  type        = string
+}
+
+variable "network_id" {
+  description = "Die ID des Docker-Netzwerks, mit dem der Container verbunden werden soll."
+  type        = string
+}
+
+variable "ports" {
+  description = "Liste der Port-Mappings für den Container."
+  type = list(object({
+    internal = number
+    external = optional(number)
+    ip       = optional(string)
+    protocol = optional(string)
+  }))
+  default = []
+}
+
+variable "command" {
+  description = "Der Befehl, der beim Start des Containers ausgeführt wird."
+  type        = list(string)
+  default     = []
+}
