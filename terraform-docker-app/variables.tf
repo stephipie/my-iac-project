@@ -27,7 +27,7 @@ variable "node_app_image" {
   type        = string
   # Dies ist ein Dummy-Image. Für eine echte App müsstest du dein eigenes Dockerfile bauen und pushen. Das Dummy-Image nutze ich hier nur für Demo-Zwecke und zum testen.
   # Beispiel: "node:14-alpine" oder dein eigenes Image "your-registry/your-node-app:latest"
-  default     = "alpine/git" # Ein einfaches Image für Demo-Zwecke. Du kannst es später durch deine App ersetzen.
+  default = "alpine/git" # Ein einfaches Image für Demo-Zwecke. Du kannst es später durch deine App ersetzen.
 }
 
 variable "node_app_container_port" {
