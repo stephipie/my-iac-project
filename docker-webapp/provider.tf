@@ -10,3 +10,5 @@ terraform {
 }
 
 provider "docker" {}
+# This provider block configures the Docker provider for Terraform.
+
