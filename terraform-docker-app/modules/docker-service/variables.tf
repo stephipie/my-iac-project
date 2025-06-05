@@ -29,3 +29,13 @@ variable "command" {
   type        = list(string)
   default     = []
 }
+
+variable "volumes" {
+  description = "Eine Liste von Volume-Mount-Definitionen für den Container."
+  type = list(object({
+    host_path      = string
+    container_path = string
+    read_only      = optional(bool, false)
+  }))
+  default = []
+}
