@@ -39,3 +39,9 @@ variable "volumes" {
   }))
   default = []
 }
+
+variable "environment" {
+  description = "Umgebungsvariablen für den Container als Map."
+  type        = map(string)
+  default     = {}
+}
