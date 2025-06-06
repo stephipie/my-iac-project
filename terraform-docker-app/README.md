@@ -147,3 +147,80 @@ Die Parametrisierung durch mindestens 3 verschiedene Variablentypen (string, num
 Mindestens 2 Outputs nutzt, die relevante Informationen aus der erstellten Infrastruktur extrahieren und für den Benutzer oder nachfolgende Prozesse zugänglich machen.
 Mindestens 1 Locals-Block verwendet, um berechnete Werte zu zentralisieren und die Lesbarkeit und Wartbarkeit der Konfiguration zu verbessern (z.B. für die konsistente Benennung von Ressourcen).
 Ein eigenes lokales Modul (docker-service) erstellt und instanziiert. Die Notwendigkeit, ein Modul zu entwickeln, zeigt das Verständnis für Wiederverwendbarkeit und Strukturierung. Eine triviale Aufgabe würde dies nicht erfordern; man würde einfach die Ressourcen direkt definieren. Die Kombination dieser Bausteine und das Verständnis, wann und wie sie sinnvoll eingesetzt werden, macht die Aufgabe zu einer Ganztagesaufgabe. Es geht nicht nur darum, jede Komponente zu definieren, sondern sie zu einem kohärenten, flexiblen und wartbaren Ganzen zu verbinden.
+
+# Remote State Konfiguration
+Dieses Terraform-Projekt ist so konfiguriert, dass es einen Remote State verwendet, um die Best Practices für das Management des Infrastrukturzustands zu erfüllen.
+
+## Warum Remote State?
+Die Nutzung eines Remote State Backends bietet signifikante Vorteile gegenüber der Standard-Methode, den Terraform State lokal zu speichern:
+
+* Vorteile für Teams: In Teamumgebungen ermöglicht der Remote State, dass mehrere Teammitglieder gleichzeitig an der Infrastruktur arbeiten können, ohne Konflikte beim State zu verursachen. Jedes terraform plan oder terraform apply greift auf denselben zentralen State zu, was eine konsistente Sicht auf die Infrastruktur gewährleistet und "State-Drift" (abweichende Ansichten des Infrastrukturzustands) verhindert.
+* Robustheit und Zuverlässigkeit: Der State wird in einem persistenten, fehlertoleranten Cloud-Storage gespeichert. Dies schützt vor lokalem Datenverlust, falls die lokale terraform.tfstate-Datei beschädigt wird oder verloren geht (z.B. durch Hardware-Defekte oder versehentliches Löschen).
+* Sicherheit: Cloud-Speicher bieten in der Regel bessere Sicherheitsfunktionen (Verschlüsselung, Zugriffskontrolle) als lokale Dateisysteme.
+
+## Gewählter Cloud Provider und Backend
+Für dieses Projekt wurde AWS S3 als Remote State Backend gewählt. S3 bietet eine hochverfügbare, skalierbare und sichere Speicherlösung, die ideal für Terraform State-Dateien ist.
+
+## Konfiguration des Backend Blocks
+Der backend Block ist innerhalb des terraform Blocks in der Datei backend.tf definiert. 
+backend.tf
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-remote-state-bucket-stephi"
+    key            = "terraform/state/my-iac-project.tfstate"
+    region         = "eu-central-1"    
+  }
+}
+```
+provider.tf
+```hcl
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.6.0"
+    }
+    aws = { # Neuer AWS Provider Block
+      source  = "hashicorp/aws"
+      version = "~> 5.0" # nutze die aktuelle Version
+    }
+  }
+}
+
+# AWS Provider Konfiguration
+provider "aws" {
+  region = "eu-central-1" # Ersetze dies mit deiner gewünschten AWS Region
+}
+```
+## Migration des States mit terraform init
+Nachdem der backend Block in der Konfiguration definiert wurde, wurde der Befehl terraform init ausgeführt:
+
+```bash
+terraform init
+```
+Terraform erkannte dabei, dass ein Remote Backend konfiguriert war und dass bereits ein lokaler State (terraform.tfstate) existierte. Terraform fragte, ob der lokale State zum neuen Remote Backend migriert werden sollte. Diese Frage wurde mit yes beantwortet, woraufhin Terraform den gesamten Inhalt des lokalen States sicher in den konfigurierten S3-Bucket (oder Azure Blob Storage Container) verschob. Der Output des terraform init Befehls bestätigte die erfolgreiche Migration.
+
+## Überprüfung des Remote States
+Der erfolgreiche Umzug des States in die Cloud wurde wie folgt überprüft:
+
+Ich habe mich in die AWS Management Console begeben, zum S3-Service navigiert und den zuvor erstellten Bucket (my-terraform-state-bucket-yourname-unique) geöffnet. Dort konnte ich ein Objekt mit dem Pfad und Namen terraform/state/my-iac-project.tfstate finden, was bestätigt, dass die State-Datei nun in der Cloud gespeichert ist.
+
+## Rolle der lokalen terraform.tfstate Datei nach der Migration
+Nach der erfolgreichen Migration ist die lokale terraform.tfstate-Datei entweder komplett verschwunden oder stark verkleinert. Sie enthält nun lediglich einen Verweis auf das Remote Backend. Zukünftige terraform Befehle (wie plan, apply, destroy) lesen den State direkt aus dem konfigurierten Remote Backend und schreiben Änderungen auch wieder dorthin zurück. Die lokale Datei spielt keine operative Rolle mehr für den eigentlichen Zustand der Infrastruktur.
+
+## Sicherheitsmaßnahmen für den Remote State (AWS S3 Beispiel)
+Für den S3 Bucket, der den Terraform State speichert, wurden folgende Sicherheitsmaßnahmen getroffen (Best Practices):
+
+* Bucket Versioning: Das Versioning ist für den S3 Bucket aktiviert. Dies bietet einen Schutz vor versehentlichem Löschen oder Überschreiben des State-Files, da frühere Versionen der Datei jederzeit wiederhergestellt werden können. Dies ist entscheidend für die Wiederherstellbarkeit im Fehlerfall.
+* Serverseitige Verschlüsselung (SSE-S3): Der S3 Bucket ist so konfiguriert, dass alle Objekte standardmäßig serverseitig verschlüsselt werden. Dies gewährleistet, dass die State-Datei im Ruhezustand (at-rest) in AWS verschlüsselt ist, was eine zusätzliche Sicherheitsebene darstellt.
+* Block Public Access: Alle "Block Public Access"-Einstellungen sind standardmäßig aktiviert, um sicherzustellen, dass der S3 Bucket und seine Inhalte niemals öffentlich zugänglich sind.
+* IAM-Berechtigungen: Der Zugriff auf den S3-Bucket wird über fein granulierte IAM-Richtlinien kontrolliert, die nur den berechtigten Benutzern oder Rollen (z.B. dem Terraform-Ausführungsbenutzer) Lese- und Schreibzugriff erlauben. z.B. my-tf-user.
+
+Die entsprechenden Screenshots 
+* terraform init
+* terraform plan
+* terraform apply
+* S-Bucket und
+* terraform destroy
+sind im Ordner screenshots_remote-state hinterlegt. 
