@@ -223,4 +223,36 @@ Die entsprechenden Screenshots
 * terraform apply
 * S-Bucket und
 * terraform destroy
-sind im Ordner screenshots_remote-state hinterlegt. 
+sind im Ordner screenshots_remote-state hinterlegt.
+
+# Terraform Infrastruktur Projekte
+
+Dieses Repository enthält verschiedene Terraform-Projekte zur Infrastrukturautomatisierung.
+
+## Projekte
+
+### 1. Docker Multi-Container App (`terraform-docker-app/`)
+
+Dieses Projekt demonstriert die Bereitstellung einer einfachen Webanwendung bestehend aus einem Nginx-Webserver und einer Node.js-API mittels Terraform und dem Docker Provider. Es nutzt alle geforderten HCL-Bausteine (Variablen, Outputs, Locals, Module) zur Strukturierung und Parametrisierung der Infrastruktur.
+
+---
+
+### 2. # Remote State Konfiguration
+Dieses Terraform-Projekt ist so konfiguriert, dass es einen Remote State verwendet, um die Best Practices für das Management des Infrastrukturzustands zu erfüllen.
+
+---
+
+### 3. AWS S3 Bucket Recherche (`terraform-aws-s3-research/`)
+
+Eine Forschungsaufgabe zur Implementierung eines S3 Buckets in AWS mit Terraform. 
+
+**Inhalt:**
+- Implementierung eines S3 Buckets mit dem offiziellen AWS S3 Bucket Modul
+- Konfiguration von Versionierung und Zugriffsrechten
+- Authentifizierung über Umgebungsvariablen
+- Vollständige Dokumentation des Prozesses
+
+**Ergebnisse:**
+- Detaillierte Dokumentation: [`terraform-aws-s3-research/aws-s3-research.md`](terraform-aws-s3-research/aws-s3-research.md)
+- Terraform-Konfiguration: [`terraform-aws-s3-research/main.tf`](terraform-aws-s3-research/main.tf)
+- Screenshots der Implementierung im Verzeichnis `terraform-aws-s3-research/screenshots/`
