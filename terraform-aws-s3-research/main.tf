@@ -14,7 +14,7 @@ provider "aws" {
 
 module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.15.1" # Using the latest patch version
+  version = "~> 4.10.1" # Using the latest patch version
 
   bucket = "my-sp-research-bucket"
   acl    = "private"
