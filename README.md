@@ -237,12 +237,7 @@ Dieses Projekt demonstriert die Bereitstellung einer einfachen Webanwendung best
 
 ---
 
-### 2. # Remote State Konfiguration
-Dieses Terraform-Projekt ist so konfiguriert, dass es einen Remote State verwendet, um die Best Practices für das Management des Infrastrukturzustands zu erfüllen.
-
----
-
-### 3. AWS S3 Bucket Recherche (`terraform-aws-s3-research/`)
+### 2. AWS S3 Bucket Recherche (`terraform-aws-s3-research/`)
 
 Eine Forschungsaufgabe zur Implementierung eines S3 Buckets in AWS mit Terraform. 
 
@@ -256,3 +251,50 @@ Eine Forschungsaufgabe zur Implementierung eines S3 Buckets in AWS mit Terraform
 - Detaillierte Dokumentation: [`terraform-aws-s3-research/aws-s3-research.md`](terraform-aws-s3-research/aws-s3-research.md)
 - Terraform-Konfiguration: [`terraform-aws-s3-research/main.tf`](terraform-aws-s3-research/main.tf)
 - Screenshots der Implementierung im Verzeichnis `terraform-aws-s3-research/screenshots/`
+
+---
+
+### 3. AWS VPC und EC2 Instance (`terraform-aws-vpc-ec2/`)
+
+Ein Projekt zur Erstellung einer Basic AWS Infrastruktur mit:
+- Virtual Private Cloud (VPC)
+- Public und Private Subnets in drei Availability Zones
+- Security Group für SSH-Zugriff
+- EC2 Instance (Ubuntu 24.04 LTS)
+
+**Implementierte Ressourcen:**
+- VPC mit CIDR `10.0.0.0/16`
+- 3 Private Subnets: `10.0.1.0/24`, `10.0.2.0/24`, `10.0.3.0/24`
+- 3 Public Subnets: `10.0.101.0/24`, `10.0.102.0/24`, `10.0.103.0/24`
+- Security Group für SSH (Port 22)
+- EC2 t2.micro Instance mit Ubuntu 24.04
+
+**Projektstruktur:**
+```
+terraform-aws-vpc-ec2/
+├── main.tf           # Hauptkonfiguration (VPC, EC2)
+├── variables.tf      # Variablendefinitionen
+├── outputs.tf        # Output-Definitionen
+├── provider.tf       # AWS Provider Konfiguration
+└── screenshots/      # Implementierungsbeweise
+```
+
+**Implementation Steps:**
+1. Terraform Initialisierung: ![Terraform Init](terraform-aws-vpc-ec2/screenshots/tf-init.png)
+2. Ressourcen-Planung: ![Terraform Plan](terraform-aws-vpc-ec2/screenshots/tf-plan.png)
+3. Infrastruktur-Erstellung: ![Terraform Apply](terraform-aws-vpc-ec2/screenshots/tf-apply.png)
+
+**Erstellte AWS Ressourcen:**
+- VPC: ![VPC in AWS Console](terraform-aws-vpc-ec2/screenshots/VPC.png)
+- EC2 Instance: ![EC2 in AWS Console](terraform-aws-vpc-ec2/screenshots/EC2.png)
+- Security Group: ![Security Group](terraform-aws-vpc-ec2/screenshots/ssh-access-sg.png)
+- Subnets: ![Subnets](terraform-aws-vpc-ec2/screenshots/Subnet.png)
+
+**Cleanup:**
+- Destroy Command: ![Terraform Destroy](terraform-aws-vpc-ec2/screenshots/tf-destroy.png)
+- Verified Deletion: 
+  - ![VPC Deleted](terraform-aws-vpc-ec2/screenshots/vpc-after-destroy.png)
+  - ![EC2 Deleted](terraform-aws-vpc-ec2/screenshots/ec2-after-destroy.png)
+  - ![Security Group Deleted](terraform-aws-vpc-ec2/screenshots/sg-after-destroy.png)
+
+Eine detaillierte Reflexion über die Implementierung befindet sich in der [reflexion.md](terraform-aws-vpc-ec2/reflexion.md).
